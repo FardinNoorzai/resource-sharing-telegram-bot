@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class AdminResponseStrategy implements ResponseStrategy {
-    AdminHomeResponseStrategy adminHomeResponseStrategy;
     AdminStartResponseStrategy adminStartResponseStrategy;
-    AdminBookResponseStrategy adminBookResponseStrategy;
-    AdminNewBookResponseStrategy adminNewBookResponseStrategy;
 
 
     @Override
@@ -23,9 +20,8 @@ public class AdminResponseStrategy implements ResponseStrategy {
         USER_STATES state = stateMachine.getState().getId();
         switch (state){
             case START -> adminStartResponseStrategy.response(userSession);
-            case WAITING_FOR_HOME_KEYBOARD_RESPONSE -> adminHomeResponseStrategy.response(userSession);
-            case WAITING_FOR_BOOK_KEYBOARD_RESPONSE -> adminBookResponseStrategy.response(userSession);
-            case WAITING_FOR_NEW_BOOK_NAME -> adminNewBookResponseStrategy.response(userSession);
+            case HOME -> adminStartResponseStrategy.response(userSession);
+            case BOOK_MANAGEMENT -> adminStartResponseStrategy.response(userSession);
         }
     }
 }

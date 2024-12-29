@@ -20,6 +20,4 @@ public class User {
     String username;
     @Enumerated(EnumType.STRING)
     USER_ROLE USER_ROLE;
-    @Enumerated(EnumType.STRING)
-    USER_STATES USER_STATE;
 }

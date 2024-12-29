@@ -1,9 +1,15 @@
 package com.master.faez.telbot.state;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.EnableStateMachine;
+import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineBuilder;
+import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
+import org.springframework.statemachine.config.builders.StateMachineConfigurer;
+import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
+import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 
 import java.util.EnumSet;
 
@@ -11,8 +17,7 @@ import java.util.EnumSet;
 @EnableStateMachine
 public class StateMachineConfig {
 
-
-    public StateMachine<USER_STATES, USER_EVENTS> newAdminStateMachine(){
+    public StateMachine<USER_STATES, USER_EVENTS> newAdminStateMachine(String id){
         StateMachineBuilder.Builder<USER_STATES, USER_EVENTS> builder = StateMachineBuilder.builder();
         try {
             builder.configureStates()
@@ -20,6 +25,7 @@ public class StateMachineConfig {
                     .initial(USER_STATES.START)
                     .states(EnumSet.allOf(USER_STATES.class));
             adminTransition(builder);
+            builder.configureConfiguration().withConfiguration().machineId(id);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -43,39 +49,17 @@ public class StateMachineConfig {
         builder.configureTransitions()
                 .withExternal()
                 .source(USER_STATES.START)
-                .target(USER_STATES.WAITING_FOR_HOME_KEYBOARD_RESPONSE)
-                .event(USER_EVENTS.START_WAS_RECEIVED)
+                .target(USER_STATES.HOME)
+                .event(USER_EVENTS.USER_EXISTS_OR_CREATED)
                 .and()
                 .withExternal()
-                .source(USER_STATES.WAITING_FOR_HOME_KEYBOARD_RESPONSE)
-                .target(USER_STATES.WAITING_FOR_BOOK_KEYBOARD_RESPONSE)
-                .event(USER_EVENTS.BOOK_SELECTED_FROM_HOME_KEYBOARD)
+                .source(USER_STATES.HOME)
+                .target(USER_STATES.BOOK_MANAGEMENT)
+                .event(USER_EVENTS.SELECT_BOOK)
                 .and()
                 .withExternal()
-                .source(USER_STATES.WAITING_FOR_BOOK_KEYBOARD_RESPONSE)
-                .target(USER_STATES.WAITING_FOR_NEW_BOOK_NAME)
-                .event(USER_EVENTS.CREATE_BOOK_SELECTED_FROM_BOOK_KEYBOARD)
-                .and()
-                .withExternal()
-                .source(USER_STATES.WAITING_FOR_NEW_BOOK_NAME)
-                .target(USER_STATES.WAITING_FOR_BOOK_KEYBOARD_RESPONSE)
-                .event(USER_EVENTS.BOOK_CREATED)
-                .and()
-                .withExternal()
-                .source(USER_STATES.WAITING_FOR_BOOK_KEYBOARD_RESPONSE)
-                .target(USER_STATES.WAITING_FOR_BOOK_SELECTION)
-                .event(USER_EVENTS.LIST_BOOKS_SELECTED_FROM_BOOK_KEYBOARD)
-                .and()
-                .withExternal()
-                .source(USER_STATES.WAITING_FOR_BOOK_SELECTION)
-                .target(USER_STATES.WAITING_FOR_SELECTED_BOOK_KEYBOARD_RESPONSE)
-                .event(USER_EVENTS.BOOK_SELECTED_FROM_BOOK_LIST)
-                .and()
-                .withExternal()
-                .source(USER_STATES.START)
-                .target(USER_STATES.WAITING_FOR_HOME_KEYBOARD_RESPONSE)
-                .event(USER_EVENTS.USER_EXIST);
+                .source(USER_STATES.BOOK_MANAGEMENT)
+                .target(USER_STATES.BOOK_CREATE)
+                .event(USER_EVENTS.CREATE_BOOK);
     }
-
-
 }

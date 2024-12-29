@@ -18,9 +18,6 @@ public class PreviousState {
     UserStateServiceImp userStateServiceImp;
     @EventListener(PreviousStateEvent.class)
     public void onPreviousState(PreviousStateEvent event) {
-        UserSession userSession = event.getUserSession();
-        userStateServiceImp.previousStep(userSession);
-        messageProcessor.processMessage(userSession.getUpdate());
     }
 
 }
