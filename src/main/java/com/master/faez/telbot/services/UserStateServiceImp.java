@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 @Slf4j
 @Service
@@ -40,6 +41,7 @@ public class UserStateServiceImp implements UserStateService {
         System.out.println(" id " + id);
         UserSession session = getSessionFromContext(update.getMessage().getFrom().getId());
         if(session != null){
+            session.setUpdate(update);
             return session;
         }
         if(ifStateMachineExist(id)){
@@ -47,38 +49,39 @@ public class UserStateServiceImp implements UserStateService {
             User user = loadUserFromDatabase(update.getMessage().getFrom().getId());
             try {
                 StateMachine<USER_STATES,USER_EVENTS> machine = persist.restore(statemachine,id);
-                addListener(machine,id);
                 machine.start();
-                UserSession userSession = UserSession.builder()
-                        .user(user)
-                        .stateMachine(machine)
-                        .update(update)
-                        .build();
-                sessions.add(userSession);
-                return userSession;
+                return getUserSession(update, statemachine, user, machine);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }else{
             User user = createUser(update);
             StateMachine<USER_STATES,USER_EVENTS> statemachine = stateMachineConfig.newAdminStateMachine(id);
-            addListener(statemachine,id);
             statemachine.start();
             try {
                 persist.persist(statemachine,id);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            UserSession userSession = UserSession.builder()
-                    .user(user)
-                    .stateMachine(statemachine)
-                    .update(update)
-                    .build();
-            sessions.add(userSession);
-            return userSession;
+            return getUserSession(update, statemachine, user, statemachine);
 
         }
 
+    }
+
+    private UserSession getUserSession(Update update, StateMachine<USER_STATES, USER_EVENTS> statemachine, User user, StateMachine<USER_STATES, USER_EVENTS> machine) {
+        UserSession userSession = UserSession.builder()
+                .user(user)
+                .stateMachine(machine)
+                .update(update)
+                .states(new Stack<>())
+                .build();
+        StateMachineListener stateMachineListener = new StateMachineListener();
+        stateMachineListener.setUserSession(userSession);
+        stateMachineListener.setPersist(persist);
+        statemachine.addStateListener(stateMachineListener);
+        sessions.add(userSession);
+        return userSession;
     }
 
     public UserSession getSessionFromContext(Long userId) {
@@ -113,21 +116,4 @@ public class UserStateServiceImp implements UserStateService {
     public boolean ifStateMachineExist(String id){
         return stateMachineService.exist(id);
     }
-
-    public void addListener(StateMachine<USER_STATES,USER_EVENTS> machine,String id){
-        machine.addStateListener(new StateMachineListener(){
-            @Override
-            public void stateChanged(State<USER_STATES, USER_EVENTS> from, State<USER_STATES, USER_EVENTS> to) {
-                log.warn("machine with id {} has changed from {} to {}",id,from.getId().name(),to.getId().name());
-                super.stateChanged(from, to);
-            }
-
-            @Override
-            public void stateMachineStarted(StateMachine<USER_STATES, USER_EVENTS> stateMachine) {
-                log.warn("machine with id {} has started", id);
-                super.stateMachineStarted(stateMachine);
-            }
-        });
-    }
-
 }

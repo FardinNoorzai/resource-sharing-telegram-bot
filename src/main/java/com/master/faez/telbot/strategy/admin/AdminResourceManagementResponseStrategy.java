@@ -13,11 +13,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class AdminBookManagementResponseStrategy implements ResponseStrategy {
+public class AdminResourceManagementResponseStrategy implements ResponseStrategy {
     @Autowired
     ApplicationEventPublisher applicationEventPublisher;
     @Autowired
@@ -26,18 +25,13 @@ public class AdminBookManagementResponseStrategy implements ResponseStrategy {
     public void response(UserSession userSession) {
         String text = userSession.getUpdate().getMessage().getText();
         StateMachine<USER_STATES, USER_EVENTS> stateMachine = userSession.getStateMachine();
-        if(text.equalsIgnoreCase("List Books")){
-            List<String> bookNames = bookService.findAllBooksNames();
-            bookNames.add("Back");
-            applicationEventPublisher.publishEvent(new ProcessedMessage(this,bookNames,null,List.of("You can select one of the books"),userSession));
-            System.out.println("book management event was published");
-            stateMachine.sendEvent(USER_EVENTS.BOOK_LIST_SELECTED);
-        }else if(text.equalsIgnoreCase("Create New Book")){
-            applicationEventPublisher.publishEvent(new ProcessedMessage(this,List.of("Back"),null,List.of("send me the name of book","Use the keyboard when you are done"),userSession));
-            stateMachine.sendEvent(USER_EVENTS.CREATE_BOOK);
+        if(text.equalsIgnoreCase("Delete book")){
+            applicationEventPublisher.publishEvent(new ProcessedMessage(this, List.of("Yes","Back"),null,List.of("Are you sure that you want to delete the book?","This action can't be back!"),userSession));
+            stateMachine.sendEvent(USER_EVENTS.DELETE_BOOK);
         }else{
-            applicationEventPublisher.publishEvent(new ProcessedMessage(this, CONSTANTS.KEYBOARD_BOOK_MANAGEMENT, null,List.of("select one of keys to proceed"),userSession));
+            Book book = (Book)stateMachine.getExtendedState().getVariables().get("book");
+            applicationEventPublisher.publishEvent(new ProcessedMessage(this, CONSTANTS.KEYBOARD_RESOURCE_MANAGEMENT,null,List.of("You selected book with id: "+book.getId() +" Name :"+ book.getName(),"Use the Keyboard to proceed."),userSession));
+
         }
     }
-
 }

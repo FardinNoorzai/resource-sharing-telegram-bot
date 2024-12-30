@@ -12,12 +12,14 @@ import java.util.Stack;
 @Setter
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @ToString
 public class UserSession {
     User user;
     Update update;
     StateMachine<USER_STATES, USER_EVENTS> stateMachine;
-    Stack<USER_STATES> states = new Stack<>();
+    Stack<USER_STATES> states;
+    public UserSession() {
+        states = new Stack<>();
+    }
 }

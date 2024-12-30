@@ -23,7 +23,7 @@ public class BookService {
     public Book save(Book book) {
         return bookRepository.save(book);
     }
-    public void DeleteById(Integer id) {
+    public void deleteById(Integer id) {
         bookRepository.deleteById(id);
     }
     public List<String> findAllBooksNames() {
@@ -33,5 +33,8 @@ public class BookService {
             bookNames.add(book.getName());
         });
         return bookNames;
+    }
+    public Book findByName(String name) {
+        return bookRepository.findBookByName(name).orElse(null);
     }
 }

@@ -4,7 +4,6 @@ import com.master.faez.telbot.constants.CONSTANTS;
 import com.master.faez.telbot.core.UserSession;
 import com.master.faez.telbot.response.ProcessedMessage;
 import com.master.faez.telbot.state.USER_EVENTS;
-import com.master.faez.telbot.state.USER_STATES;
 import com.master.faez.telbot.strategy.ResponseStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,14 +19,6 @@ public class AdminStartResponseStrategy implements ResponseStrategy {
     public void response(UserSession userSession) {
         ProcessedMessage processedMessage = new ProcessedMessage(this, CONSTANTS.KEYBOARD_HOME,null, List.of("you can user keyboard to navigated into different sections"),userSession);
         applicationEventPublisher.publishEvent(processedMessage);
-        if(userSession.getStateMachine().getState().getId().equals(USER_STATES.START)) {
-            userSession.getStateMachine().sendEvent(USER_EVENTS.USER_EXISTS_OR_CREATED);
-        }
-        else if(userSession.getStateMachine().getState().getId().equals(USER_STATES.HOME)) {
-            userSession.getStateMachine().sendEvent(USER_EVENTS.SELECT_BOOK);
-        }
-        else if(userSession.getStateMachine().getState().getId().equals(USER_STATES.BOOK_MANAGEMENT)) {
-            userSession.getStateMachine().sendEvent(USER_EVENTS.CREATE_BOOK);
-        }
+        userSession.getStateMachine().sendEvent(USER_EVENTS.USER_EXISTS_OR_CREATED);
     }
 }

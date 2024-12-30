@@ -1,17 +1,9 @@
 package com.master.faez.telbot.state;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.EnableStateMachine;
-import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineBuilder;
-import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
-import org.springframework.statemachine.config.builders.StateMachineConfigurer;
-import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
-import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
-
-import java.util.EnumSet;
 
 @Configuration
 @EnableStateMachine
@@ -20,10 +12,15 @@ public class StateMachineConfig {
     public StateMachine<USER_STATES, USER_EVENTS> newAdminStateMachine(String id){
         StateMachineBuilder.Builder<USER_STATES, USER_EVENTS> builder = StateMachineBuilder.builder();
         try {
-            builder.configureStates()
+                builder.configureStates()
                     .withStates()
                     .initial(USER_STATES.START)
-                    .states(EnumSet.allOf(USER_STATES.class));
+                    .state(USER_STATES.HOME)
+                    .state(USER_STATES.BOOK_MANAGEMENT)
+                        .state(USER_STATES.BOOK_LIST)
+                        .state(USER_STATES.RESOURCE_MANAGEMENT)
+                        .state(USER_STATES.BOOK_CREATE)
+                        .state(USER_STATES.BOOK_DELETE);
             adminTransition(builder);
             builder.configureConfiguration().withConfiguration().machineId(id);
         } catch (Exception e) {
@@ -37,7 +34,12 @@ public class StateMachineConfig {
             builder.configureStates()
                     .withStates()
                     .initial(state)
-                    .states(EnumSet.allOf(USER_STATES.class));
+                    .state(USER_STATES.HOME)
+                    .state(USER_STATES.BOOK_MANAGEMENT)
+                    .state(USER_STATES.BOOK_LIST)
+                    .state(USER_STATES.RESOURCE_MANAGEMENT)
+                    .state(USER_STATES.BOOK_CREATE)
+                    .state(USER_STATES.BOOK_DELETE);
             adminTransition(builder);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -59,7 +61,27 @@ public class StateMachineConfig {
                 .and()
                 .withExternal()
                 .source(USER_STATES.BOOK_MANAGEMENT)
+                .target(USER_STATES.BOOK_LIST)
+                .event(USER_EVENTS.BOOK_LIST_SELECTED)
+                .and()
+                .withExternal()
+                .source(USER_STATES.BOOK_LIST)
+                .target(USER_STATES.RESOURCE_MANAGEMENT)
+                .event(USER_EVENTS.BOOK_SELECTED)
+                .and()
+                .withExternal()
+                .source(USER_STATES.BOOK_MANAGEMENT)
                 .target(USER_STATES.BOOK_CREATE)
-                .event(USER_EVENTS.CREATE_BOOK);
+                .event(USER_EVENTS.CREATE_BOOK)
+                .and()
+                .withExternal()
+                .source(USER_STATES.RESOURCE_MANAGEMENT)
+                .target(USER_STATES.BOOK_DELETE)
+                .event(USER_EVENTS.DELETE_BOOK)
+                .and()
+                .withExternal()
+                .source(USER_STATES.BOOK_DELETE)
+                .target(USER_STATES.BOOK_MANAGEMENT)
+                .event(USER_EVENTS.DELETE_BOOK);
     }
 }
