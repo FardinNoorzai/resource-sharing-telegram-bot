@@ -13,7 +13,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
 
+import javax.swing.plaf.nimbus.State;
 import java.util.List;
+import java.util.Stack;
 
 @Service
 public class AdminDeleteBookResponseStrategy implements ResponseStrategy {
@@ -27,10 +29,18 @@ public class AdminDeleteBookResponseStrategy implements ResponseStrategy {
         StateMachine<USER_STATES, USER_EVENTS> machine = userSession.getStateMachine();
         if(text.equalsIgnoreCase("Yes")){
             Book book = (Book) machine.getExtendedState().getVariables().get("book");
+            System.out.println(book);
             bookService.deleteById(book.getId());
             applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of("Book with name: "+ book.getName()+" was deleted","you are returned back to book selection menu"),userSession));
             applicationEventPublisher.publishEvent(new ProcessedMessage(this, CONSTANTS.KEYBOARD_BOOK_MANAGEMENT, null, List.of("select one of keys to proceed"),userSession));
             machine.sendEvent(USER_EVENTS.DELETE_BOOK);
+            Stack<USER_STATES> stateStack = userSession.getStates();
+            while (!stateStack.empty() && (stateStack.peek() != USER_STATES.BOOK_MANAGEMENT || stateStack.peek() == USER_STATES.BOOK_MANAGEMENT)) {
+                stateStack.pop();
+            }
+            for(USER_STATES state : userSession.getStates()) {
+                System.out.println(state.toString());
+            }
         }
     }
 }
