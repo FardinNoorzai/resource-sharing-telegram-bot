@@ -2,7 +2,6 @@ package com.master.faez.telbot.strategy.admin;
 
 import com.master.faez.telbot.constants.CONSTANTS;
 import com.master.faez.telbot.core.UserSession;
-import com.master.faez.telbot.models.Book;
 import com.master.faez.telbot.response.ProcessedMessage;
 import com.master.faez.telbot.services.BookService;
 import com.master.faez.telbot.services.ResourceService;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class AdminResourceManagementResponseStrategy implements ResponseStrategy {
+public class AdminFileManagementResponseStrategy implements ResponseStrategy {
     @Autowired
     ApplicationEventPublisher applicationEventPublisher;
     @Autowired
@@ -28,9 +27,10 @@ public class AdminResourceManagementResponseStrategy implements ResponseStrategy
     public void response(UserSession userSession) {
         String text = userSession.getUpdate().getMessage().getText();
         StateMachine<USER_STATES, USER_EVENTS> stateMachine = userSession.getStateMachine();
-        if(text.equalsIgnoreCase("Delete book")){
-            applicationEventPublisher.publishEvent(new ProcessedMessage(this, List.of("Yes","Back"),null,List.of("Are you sure that you want to delete the book?","This action can't be back!"),userSession));
-            stateMachine.sendEvent(USER_EVENTS.DELETE_BOOK);
+        if(text.equalsIgnoreCase("Delete Resource")){
+            applicationEventPublisher.publishEvent(new ProcessedMessage(this, List.of("Yes","Back"),null,List.of("Are you sure that you want to delete the resource?","This action can't be back!"),userSession));
+            System.out.println("was publisheddddddddddddd");
+            stateMachine.sendEvent(USER_EVENTS.DELETE_RESOURCE);
         }else if(text.equalsIgnoreCase("Create new Resource type")){
             applicationEventPublisher.publishEvent(new ProcessedMessage(this,List.of("Back"),null,List.of("send me the name of Resource","Use the keyboard when you are done"),userSession));
             stateMachine.sendEvent(USER_EVENTS.CREATE_RESOURCE);

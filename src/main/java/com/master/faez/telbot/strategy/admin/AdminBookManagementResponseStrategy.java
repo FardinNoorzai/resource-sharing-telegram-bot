@@ -30,7 +30,6 @@ public class AdminBookManagementResponseStrategy implements ResponseStrategy {
             List<String> bookNames = bookService.findAllBooksNames();
             bookNames.add("Back");
             applicationEventPublisher.publishEvent(new ProcessedMessage(this,bookNames,null,List.of("You can select one of the books"),userSession));
-            System.out.println("book management event was published");
             stateMachine.sendEvent(USER_EVENTS.BOOK_LIST_SELECTED);
         }else if(text.equalsIgnoreCase("Create New Book")){
             applicationEventPublisher.publishEvent(new ProcessedMessage(this,List.of("Back"),null,List.of("send me the name of book","Use the keyboard when you are done"),userSession));

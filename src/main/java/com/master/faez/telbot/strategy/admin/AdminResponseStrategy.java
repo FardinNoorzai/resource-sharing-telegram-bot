@@ -29,6 +29,15 @@ public class AdminResponseStrategy implements ResponseStrategy {
     AdminResourceManagementResponseStrategy adminResourceManagementResponseStrategy;
     @Autowired
     AdminDeleteBookResponseStrategy adminDeleteBookResponseStrategy;
+    @Autowired
+    AdminCreateNewResourceTypeResponseStrategy adminCreateNewResourceTypeResponseStrategy;
+    @Autowired
+    AdminResourceListResponseStrategy adminResourceListResponseStrategy;
+    @Autowired
+    AdminFileManagementResponseStrategy adminFileManagementResponseStrategy;
+    @Autowired
+    AdminDeleteResourceResponseStrategy adminDeleteResourceResponseStrategy;
+
 
     HashMap<USER_STATES, ResponseStrategy> responseStrategies;
     @Override
@@ -52,7 +61,10 @@ public class AdminResponseStrategy implements ResponseStrategy {
         responseStrategies.put(USER_STATES.BOOK_CREATE,adminCreateBookResponseStrategy);
         responseStrategies.put(USER_STATES.RESOURCE_MANAGEMENT, adminResourceManagementResponseStrategy);
         responseStrategies.put(USER_STATES.BOOK_DELETE, adminDeleteBookResponseStrategy);
-
+        responseStrategies.put(USER_STATES.RESOURCE_CREATE,adminCreateNewResourceTypeResponseStrategy);
+        responseStrategies.put(USER_STATES.RESOURCE_LIST, adminResourceListResponseStrategy);
+        responseStrategies.put(USER_STATES.FILE_MANAGEMENT, adminFileManagementResponseStrategy);
+        responseStrategies.put(USER_STATES.RESOURCE_DELETE, adminDeleteResourceResponseStrategy);
 
     }
 }

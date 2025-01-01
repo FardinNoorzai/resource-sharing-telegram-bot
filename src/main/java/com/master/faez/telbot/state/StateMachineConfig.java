@@ -20,7 +20,11 @@ public class StateMachineConfig {
                         .state(USER_STATES.BOOK_LIST)
                         .state(USER_STATES.RESOURCE_MANAGEMENT)
                         .state(USER_STATES.BOOK_CREATE)
-                        .state(USER_STATES.BOOK_DELETE);
+                        .state(USER_STATES.BOOK_DELETE)
+                        .state(USER_STATES.RESOURCE_CREATE)
+                        .state(USER_STATES.RESOURCE_LIST)
+                        .state(USER_STATES.FILE_MANAGEMENT)
+                        .state(USER_STATES.RESOURCE_DELETE);
             adminTransition(builder);
             builder.configureConfiguration().withConfiguration().machineId(id);
         } catch (Exception e) {
@@ -39,7 +43,12 @@ public class StateMachineConfig {
                     .state(USER_STATES.BOOK_LIST)
                     .state(USER_STATES.RESOURCE_MANAGEMENT)
                     .state(USER_STATES.BOOK_CREATE)
-                    .state(USER_STATES.BOOK_DELETE);
+                    .state(USER_STATES.BOOK_DELETE)
+                    .state(USER_STATES.RESOURCE_CREATE)
+                    .state(USER_STATES.RESOURCE_LIST)
+                    .state(USER_STATES.FILE_MANAGEMENT)
+                    .state(USER_STATES.RESOURCE_DELETE);
+
             adminTransition(builder);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -82,6 +91,31 @@ public class StateMachineConfig {
                 .withExternal()
                 .source(USER_STATES.BOOK_DELETE)
                 .target(USER_STATES.BOOK_MANAGEMENT)
-                .event(USER_EVENTS.DELETE_BOOK);
+                .event(USER_EVENTS.DELETE_BOOK)
+                .and()
+                .withExternal()
+                .source(USER_STATES.RESOURCE_MANAGEMENT)
+                .target(USER_STATES.RESOURCE_CREATE)
+                .event(USER_EVENTS.CREATE_RESOURCE)
+                .and()
+                .withExternal()
+                .source(USER_STATES.RESOURCE_MANAGEMENT)
+                .target(USER_STATES.RESOURCE_LIST)
+                .event(USER_EVENTS.SELECT_RESOURCE)
+                .and()
+                .withExternal()
+                .source(USER_STATES.RESOURCE_LIST)
+                .target(USER_STATES.FILE_MANAGEMENT)
+                .event(USER_EVENTS.RESOURCE_SELECTED)
+                .and()
+                .withExternal()
+                .source(USER_STATES.FILE_MANAGEMENT)
+                .target(USER_STATES.RESOURCE_DELETE)
+                .event(USER_EVENTS.DELETE_RESOURCE)
+                .and()
+                .withExternal()
+                .source(USER_STATES.RESOURCE_DELETE)
+                .target(USER_STATES.RESOURCE_MANAGEMENT)
+                .event(USER_EVENTS.DELETE_RESOURCE);
     }
 }

@@ -1,6 +1,7 @@
 package com.master.faez.telbot.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,5 +20,6 @@ public class Resource {
     Integer id;
     String name;
     @OneToMany(mappedBy = "resource")
+    @JsonIgnore
     List<File> files;
 }

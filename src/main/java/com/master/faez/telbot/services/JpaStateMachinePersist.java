@@ -3,6 +3,7 @@ package com.master.faez.telbot.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.master.faez.telbot.models.Book;
+import com.master.faez.telbot.models.Resource;
 import com.master.faez.telbot.models.StateMachineEntity;
 import com.master.faez.telbot.repositories.StateMachineRepository;
 import com.master.faez.telbot.state.USER_EVENTS;
@@ -32,7 +33,6 @@ public class JpaStateMachinePersist implements StateMachinePersist<USER_STATES, 
         entity.setMachineId(machineId);
         entity.setState(context.getState().toString());
 
-        // Serialize the extended state to JSON
         String extendedStateJson = objectMapper.writeValueAsString(context.getExtendedState().getVariables());
         entity.setContext(extendedStateJson);
 
@@ -48,28 +48,33 @@ public class JpaStateMachinePersist implements StateMachinePersist<USER_STATES, 
             // Deserialize the JSON back to a map
             Map<Object, Object> extendedStateVariables = objectMapper.readValue(
                     smEntity.getContext(),
-                    new TypeReference<Map<Object, Object>>() {} // Preserve type safety
+                    new TypeReference<Map<Object, Object>>() {}
             );
 
-            // Handle specific keys that need conversion
             if (extendedStateVariables.containsKey("book")) {
                 Object bookObject = extendedStateVariables.get("book");
                 if (bookObject instanceof Map) {
-                    // Convert LinkedHashMap to Book
                     Book book = objectMapper.convertValue(bookObject, Book.class);
                     extendedStateVariables.put("book", book);
                 } else if (bookObject instanceof String) {
-                    // Handle case where it's a JSON string
                     Book book = objectMapper.readValue(bookObject.toString(), Book.class);
                     extendedStateVariables.put("book", book);
                 }
             }
+            
+            if (extendedStateVariables.containsKey("resource")) {
+                Object resourceObject = extendedStateVariables.get("resource");
+                if (resourceObject instanceof Map) {
+                    Resource resource = objectMapper.convertValue(resourceObject, Resource.class);
+                    extendedStateVariables.put("resource", resource);
+                } else if (resourceObject instanceof String) {
+                    Resource resource = objectMapper.readValue(resourceObject.toString(), Resource.class);
+                    extendedStateVariables.put("resource", resource);
+                }
+            }
 
-            // Rebuild extended state
             ExtendedState extendedState = new DefaultExtendedState();
             extendedState.getVariables().putAll(extendedStateVariables);
-
-            // Return the state machine context
             return new DefaultStateMachineContext<>(
                     USER_STATES.valueOf(smEntity.getState()),
                     null,
@@ -82,11 +87,8 @@ public class JpaStateMachinePersist implements StateMachinePersist<USER_STATES, 
 
 
     public Book getBookFromExtendedState(StateMachineContext<USER_STATES, USER_EVENTS> context) {
-        // Convert the LinkedHashMap to a Book object
         Map<Object, Object> variables = context.getExtendedState().getVariables();
         Object bookObject = variables.get("book");
-
-        // Ensure it's a LinkedHashMap before converting
         if (bookObject instanceof Map) {
             return objectMapper.convertValue(bookObject, Book.class);  // Deserialize to Book object
         }
