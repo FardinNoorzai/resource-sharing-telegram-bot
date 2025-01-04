@@ -22,6 +22,7 @@ public class AdminFileSelectedResponseStrategy implements ResponseStrategy {
 
     @Override
     public void response(UserSession userSession) {
+
         Update update = userSession.getUpdate();
         StateMachine<USER_STATES,USER_EVENTS> machine = userSession.getStateMachine();
         if(update.getMessage().getText().equalsIgnoreCase("Edit")){
