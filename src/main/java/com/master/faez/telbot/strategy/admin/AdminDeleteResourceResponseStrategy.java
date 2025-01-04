@@ -42,11 +42,15 @@ public class AdminDeleteResourceResponseStrategy implements ResponseStrategy {
             applicationEventPublisher.publishEvent(new ProcessedMessage(this, CONSTANTS.KEYBOARD_RESOURCE_MANAGEMENT, null, List.of("select one of keys to proceed"),userSession));
             machine.sendEvent(USER_EVENTS.DELETE_RESOURCE);
             Stack<USER_STATES> stateStack = userSession.getStates();
-            while (!stateStack.empty() && (stateStack.peek() != USER_STATES.RESOURCE_MANAGEMENT || stateStack.peek() == USER_STATES.RESOURCE_MANAGEMENT)) {
-                stateStack.pop();
-            }
-            for(USER_STATES state : userSession.getStates()) {
-                System.out.println(state.toString());
+
+            while (!stateStack.empty()) {
+                if(stateStack.peek() != USER_STATES.RESOURCE_MANAGEMENT){
+                    stateStack.pop();
+                }
+                if(stateStack.peek() == USER_STATES.RESOURCE_MANAGEMENT){
+                    stateStack.pop();
+                    break;
+                }
             }
         }
     }

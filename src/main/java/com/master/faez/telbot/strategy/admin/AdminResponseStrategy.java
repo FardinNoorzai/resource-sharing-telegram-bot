@@ -37,14 +37,23 @@ public class AdminResponseStrategy implements ResponseStrategy {
     AdminFileManagementResponseStrategy adminFileManagementResponseStrategy;
     @Autowired
     AdminDeleteResourceResponseStrategy adminDeleteResourceResponseStrategy;
-
-
+    @Autowired
+    AdminAddFileResponseStrategy adminAddFileResponseStrategy;
+    @Autowired
+    AdminFileSelectionResponseStrategy adminFileSelectionResponseStrategy;
+    @Autowired
+    AdminFileSelectedResponseStrategy adminFileSelectedResponseStrategy;
+    @Autowired
+    AdminBookEditResponseStrategy adminBookEditResponseStrategy;
+    @Autowired
+    AdminEditFileResponseStrategy adminEditFileResponseStrategy;
     HashMap<USER_STATES, ResponseStrategy> responseStrategies;
     @Override
     public void response(UserSession userSession) {
         StateMachine<USER_STATES, USER_EVENTS> stateMachine = userSession.getStateMachine();
         USER_STATES state = stateMachine.getState().getId();
         ResponseStrategy responseStrategy = responseStrategies.get(state);
+        System.out.println(userSession.getUpdate());
         if(responseStrategy != null) {
             responseStrategy.response(userSession);
         }
@@ -65,6 +74,10 @@ public class AdminResponseStrategy implements ResponseStrategy {
         responseStrategies.put(USER_STATES.RESOURCE_LIST, adminResourceListResponseStrategy);
         responseStrategies.put(USER_STATES.FILE_MANAGEMENT, adminFileManagementResponseStrategy);
         responseStrategies.put(USER_STATES.RESOURCE_DELETE, adminDeleteResourceResponseStrategy);
-
+        responseStrategies.put(USER_STATES.FILE_ADD, adminAddFileResponseStrategy);
+        responseStrategies.put(USER_STATES.FILE_LIST, adminFileSelectionResponseStrategy);
+        responseStrategies.put(USER_STATES.FILE_SELECT, adminFileSelectedResponseStrategy);
+        responseStrategies.put(USER_STATES.BOOK_EDIT,adminBookEditResponseStrategy);
+        responseStrategies.put(USER_STATES.FILE_EDIT,adminEditFileResponseStrategy);
     }
 }

@@ -6,18 +6,18 @@ import lombok.*;
 @Entity
 @Setter
 @Getter
-@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    int id;
     String fileType;
+    @Column(length = 65535)
     String fileName;
     Double size;
-
+    String fileId;
     @ManyToOne
     Resource resource;
 }

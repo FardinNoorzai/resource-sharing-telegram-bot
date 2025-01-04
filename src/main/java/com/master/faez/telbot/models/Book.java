@@ -1,18 +1,18 @@
 package com.master.faez.telbot.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Setter
 @Getter
-@NoArgsConstructor
 @Builder
+@AllArgsConstructor
 @ToString
 public class Book {
     @Id
@@ -21,11 +21,16 @@ public class Book {
     int id;
     @JsonProperty("name")
     String name;
+    public Book() {
+    }
 
     @JsonCreator
     public Book(@JsonProperty("id") int id, @JsonProperty("name") String name) {
         this.name = name;
         this.id = id;
     }
+    @OneToMany(mappedBy = "book")
+    @JsonIgnore
+    List<Resource> resources;
 
 }

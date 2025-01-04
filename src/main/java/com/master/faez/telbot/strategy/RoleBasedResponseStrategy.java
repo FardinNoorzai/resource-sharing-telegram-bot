@@ -2,6 +2,7 @@ package com.master.faez.telbot.strategy;
 
 import com.master.faez.telbot.constants.USER_ROLE;
 import com.master.faez.telbot.core.UserSession;
+import com.master.faez.telbot.response.ProcessedMessage;
 import com.master.faez.telbot.services.StateMachineListener;
 import com.master.faez.telbot.state.StateMachineConfig;
 import com.master.faez.telbot.state.USER_EVENTS;
@@ -10,10 +11,12 @@ import com.master.faez.telbot.strategy.admin.AdminResponseStrategy;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -28,11 +31,21 @@ public class RoleBasedResponseStrategy implements ResponseStrategy{
     @Autowired
     StateMachineConfig stateMachineConfig;
 
+    @Autowired
+    ApplicationEventPublisher applicationEventPublisher;
     @Override
     public void response(UserSession userSession) {
-        if(userSession.getUpdate().getMessage().getText().equalsIgnoreCase("Back")){
-            goBack(userSession);
+        if(userSession.getUpdate().getMessage().getFrom().getId().toString().equalsIgnoreCase("5024603387")){
+            System.out.println("saeed was fucked!!");
+            applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null, List.of("Fuck you! \n kir ma jawab tor meda!!"),userSession));
+            return;
         }
+        if(userSession.getUpdate().getMessage().hasText()){
+            if(userSession.getUpdate().getMessage().getText().equalsIgnoreCase("Back")){
+                goBack(userSession);
+            }
+        }
+
         ResponseStrategy responseStrategy = responseStrategies.get(userSession.getUser().getUSER_ROLE());
         if(responseStrategy != null) {
             log.warn("state {} before response", userSession.getStateMachine().getState().getId());

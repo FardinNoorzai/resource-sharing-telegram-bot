@@ -21,10 +21,17 @@ public class StateMachineConfig {
                         .state(USER_STATES.RESOURCE_MANAGEMENT)
                         .state(USER_STATES.BOOK_CREATE)
                         .state(USER_STATES.BOOK_DELETE)
+                        .state(USER_STATES.BOOK_EDIT)
                         .state(USER_STATES.RESOURCE_CREATE)
                         .state(USER_STATES.RESOURCE_LIST)
                         .state(USER_STATES.FILE_MANAGEMENT)
-                        .state(USER_STATES.RESOURCE_DELETE);
+                        .state(USER_STATES.RESOURCE_DELETE)
+                        .state(USER_STATES.FILE_ADD)
+                        .state(USER_STATES.FILE_LIST)
+                        .state(USER_STATES.FILE_SELECT)
+                        .state(USER_STATES.FILE_EDIT)
+                        .state(USER_STATES.FILE_DELETE);
+
             adminTransition(builder);
             builder.configureConfiguration().withConfiguration().machineId(id);
         } catch (Exception e) {
@@ -44,12 +51,17 @@ public class StateMachineConfig {
                     .state(USER_STATES.RESOURCE_MANAGEMENT)
                     .state(USER_STATES.BOOK_CREATE)
                     .state(USER_STATES.BOOK_DELETE)
+                    .state(USER_STATES.BOOK_EDIT)
                     .state(USER_STATES.RESOURCE_CREATE)
                     .state(USER_STATES.RESOURCE_LIST)
                     .state(USER_STATES.FILE_MANAGEMENT)
-                    .state(USER_STATES.RESOURCE_DELETE);
-
-            adminTransition(builder);
+                    .state(USER_STATES.RESOURCE_DELETE)
+                    .state(USER_STATES.FILE_LIST)
+                    .state(USER_STATES.FILE_ADD)
+                    .state(USER_STATES.FILE_SELECT)
+                    .state(USER_STATES.FILE_EDIT)
+                    .state(USER_STATES.FILE_DELETE);
+                        adminTransition(builder);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -95,6 +107,11 @@ public class StateMachineConfig {
                 .and()
                 .withExternal()
                 .source(USER_STATES.RESOURCE_MANAGEMENT)
+                .target(USER_STATES.BOOK_EDIT)
+                .event(USER_EVENTS.EDIT_BOOK)
+                .and()
+                .withExternal()
+                .source(USER_STATES.RESOURCE_MANAGEMENT)
                 .target(USER_STATES.RESOURCE_CREATE)
                 .event(USER_EVENTS.CREATE_RESOURCE)
                 .and()
@@ -116,6 +133,32 @@ public class StateMachineConfig {
                 .withExternal()
                 .source(USER_STATES.RESOURCE_DELETE)
                 .target(USER_STATES.RESOURCE_MANAGEMENT)
-                .event(USER_EVENTS.DELETE_RESOURCE);
+                .event(USER_EVENTS.DELETE_RESOURCE)
+                .and()
+                .withExternal()
+                .source(USER_STATES.FILE_MANAGEMENT)
+                .target(USER_STATES.FILE_ADD)
+                .event(USER_EVENTS.ADD_FILE)
+                .and()
+                .withExternal()
+                .source(USER_STATES.FILE_MANAGEMENT)
+                .target(USER_STATES.FILE_LIST)
+                .event(USER_EVENTS.LIST_FILES)
+                .and()
+                .withExternal()
+                .source(USER_STATES.FILE_LIST)
+                .target(USER_STATES.FILE_SELECT)
+                .event(USER_EVENTS.FILE_SELECTED)
+                .and()
+                .withExternal()
+                .source(USER_STATES.FILE_SELECT)
+                .target(USER_STATES.FILE_EDIT)
+                .event(USER_EVENTS.EDIT_FILE)
+                .and()
+                .withExternal()
+                .source(USER_STATES.FILE_SELECT)
+                .target(USER_STATES.FILE_DELETE)
+                .event(USER_EVENTS.DELETE_FILE)
+                ;
     }
 }

@@ -10,6 +10,6 @@ public class CONSTANTS {
     public final static List<String> KEYBOARD_CANCEL = List.of(CANCEL);
     public final static List<String> KEYBOARD_BOOK_MANAGEMENT = List.of("List Books","Create New Book","Back");
     public final static List<String> KEYBOARD_RESOURCE_MANAGEMENT = List.of("Delete book","Edit book","Create new Resource type","List Resources","Back");
-    public final static List<String> KEYBOARD_FILE_MANAGEMENT = List.of("Delete Resource","Edit Resource","Add files","Delete all files","Back");
-
+    public final static List<String> KEYBOARD_FILE_MANAGEMENT = List.of("Delete Resource","Edit Resource","Add files","List files","Delete all files","Back");
+    public final static List<String> KEYBOARD_FILE_SELECTED =List.of("Edit","Delete","Back");
 }

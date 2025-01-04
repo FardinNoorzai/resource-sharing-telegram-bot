@@ -16,7 +16,8 @@ public enum USER_EVENTS {
     ADD_FILE,
     LIST_FILES,
     EDIT_FILE,
-    DELETE_FILE
+    DELETE_FILE,
+    FILE_SELECTED
 
 
 }

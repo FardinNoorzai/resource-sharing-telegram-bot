@@ -17,7 +17,8 @@ public enum USER_STATES {
     FILE_ADD,
     FILE_LIST,
     FILE_EDIT,
-    FILE_DELETE
+    FILE_DELETE,
+    FILE_SELECT
 
 
 }

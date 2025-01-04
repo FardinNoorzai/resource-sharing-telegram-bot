@@ -35,10 +35,14 @@ public class AdminResourceManagementResponseStrategy implements ResponseStrategy
             applicationEventPublisher.publishEvent(new ProcessedMessage(this,List.of("Back"),null,List.of("send me the name of Resource","Use the keyboard when you are done"),userSession));
             stateMachine.sendEvent(USER_EVENTS.CREATE_RESOURCE);
         }else if (text.equalsIgnoreCase("List Resources")){
-            List<String> resourceNames = resourceService.findAllBooksNames();
+            Book book = (Book) stateMachine.getExtendedState().getVariables().get("book");
+            List<String> resourceNames = resourceService.findAllByBook(book);
             resourceNames.add("Back");
             applicationEventPublisher.publishEvent(new ProcessedMessage(this,resourceNames,null,List.of("You can select one of the resources"),userSession));
             stateMachine.sendEvent(USER_EVENTS.SELECT_RESOURCE);
+        }else if (text.equalsIgnoreCase("Edit Book")){
+            applicationEventPublisher.publishEvent(new ProcessedMessage(this,List.of("Back"),null,List.of("Send me the new name for this book"),userSession));
+            stateMachine.sendEvent(USER_EVENTS.EDIT_BOOK);
         }else{
             applicationEventPublisher.publishEvent(new ProcessedMessage(this, CONSTANTS.KEYBOARD_RESOURCE_MANAGEMENT,null,List.of("select one of keys to proceed"),userSession));
         }

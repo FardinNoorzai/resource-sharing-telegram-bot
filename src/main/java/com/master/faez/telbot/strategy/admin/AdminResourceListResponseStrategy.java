@@ -29,11 +29,13 @@ public class AdminResourceListResponseStrategy implements ResponseStrategy {
         String text = userSession.getUpdate().getMessage().getText();
         StateMachine<USER_STATES, USER_EVENTS> machine = userSession.getStateMachine();
         if(text.equalsIgnoreCase("Back")){
-            List<String> bookNames = resourceService.findAllBooksNames();
+            Book book = (Book) machine.getExtendedState().getVariables().get("book");
+            List<String> bookNames = resourceService.findAllByBook(book);
             bookNames.add("Back");
             applicationEventPublisher.publishEvent(new ProcessedMessage(this,bookNames,null,List.of("You can select one of the Resources"),userSession));
         }else{
-            Resource resource = resourceService.findByName(text);
+            Book book = (Book) machine.getExtendedState().getVariables().get("book");
+            Resource resource = resourceService.findByBookAndName(text,book);
             if(resource == null){
                 System.out.println("resource was not found");
                 applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of("Use the keyboard!"),userSession));

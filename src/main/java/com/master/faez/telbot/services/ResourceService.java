@@ -19,14 +19,17 @@ public class ResourceService {
         return resourceRepository.save(resource);
     }
 
-    public List<String> findAllBooksNames() {
-        List<Resource> resources = resourceRepository.findAll();
+    public List<String> findAllByBook(Book book) {
+        List<Resource> resources = resourceRepository.findAllByBook(book);
         List<String> booksNames = new ArrayList<>();
         resources.forEach(resource -> booksNames.add(resource.getName()));
         return booksNames;
     }
-    public Resource findByName(String name) {
-        return resourceRepository.findByName(name).orElse(null);
+    public Resource findByBookAndName(String name,Book book) {
+        return resourceRepository.findByBookAndName(book,name).orElse(null);
+    }
+    public Resource findById(Integer id){
+        return resourceRepository.findById(id).orElse(null);
     }
 
 
