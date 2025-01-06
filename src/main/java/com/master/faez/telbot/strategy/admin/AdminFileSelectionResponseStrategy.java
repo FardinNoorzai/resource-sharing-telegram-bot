@@ -15,9 +15,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AdminFileSelectionResponseStrategy implements ResponseStrategy {
@@ -39,12 +39,13 @@ public class AdminFileSelectionResponseStrategy implements ResponseStrategy {
             resource.getFiles().forEach((file -> {
                 files.add(file.getFileName());
             }));
+            resourceService.save(resource);
             files.add("Back");
             if(update.getMessage().hasText() && !update.getMessage().getText().equalsIgnoreCase("Back")){
                 File file = fileService.findByName(update.getMessage().getText());
                 if(file != null){
                     stateMachine.getExtendedState().getVariables().put("file", file);
-                    applicationEventPublisher.publishEvent(new ProcessedMessage(this, CONSTANTS.KEYBOARD_FILE_SELECTED,null,List.of("You selected " + file.getFileName() + " use the keyboard to proceed"),userSession));
+                    applicationEventPublisher.publishEvent(new ProcessedMessage(this, CONSTANTS.KEYBOARD_FILE_SELECTED, Map.of(file.getFileName(),file.getFileId()),List.of("You selected " + file.getFileName() + " use the keyboard to proceed"),userSession));
                     stateMachine.sendEvent(USER_EVENTS.FILE_SELECTED);
                 }else{
                     applicationEventPublisher.publishEvent(new ProcessedMessage(this, files,null,List.of("Use the keyboard to proceed"),userSession));

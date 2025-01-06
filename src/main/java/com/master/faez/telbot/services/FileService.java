@@ -20,8 +20,7 @@ public class FileService {
 
         return fileRepository.findByFileName(name).orElse(null);
     }
-
-    public void deleteById(int id) {
-        fileRepository.deleteById(id);
+    public void delete(File file) {
+        fileRepository.delete(file);
     }
 }

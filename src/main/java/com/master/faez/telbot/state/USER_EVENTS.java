@@ -17,7 +17,8 @@ public enum USER_EVENTS {
     LIST_FILES,
     EDIT_FILE,
     DELETE_FILE,
-    FILE_SELECTED
+    FILE_SELECTED,
+    BROADCAST,
 
 
 }

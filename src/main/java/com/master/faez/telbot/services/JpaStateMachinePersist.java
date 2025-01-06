@@ -3,6 +3,7 @@ package com.master.faez.telbot.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.master.faez.telbot.models.Book;
+import com.master.faez.telbot.models.File;
 import com.master.faez.telbot.models.Resource;
 import com.master.faez.telbot.models.StateMachineEntity;
 import com.master.faez.telbot.repositories.StateMachineRepository;
@@ -70,6 +71,17 @@ public class JpaStateMachinePersist implements StateMachinePersist<USER_STATES, 
                 } else if (resourceObject instanceof String) {
                     Resource resource = objectMapper.readValue(resourceObject.toString(), Resource.class);
                     extendedStateVariables.put("resource", resource);
+                }
+            }
+
+            if (extendedStateVariables.containsKey("file")) {
+                Object resourceObject = extendedStateVariables.get("file");
+                if (resourceObject instanceof Map) {
+                    File file = objectMapper.convertValue(resourceObject, File.class);
+                    extendedStateVariables.put("file", file);
+                } else if (resourceObject instanceof String) {
+                    File file = objectMapper.readValue(resourceObject.toString(), File.class);
+                    extendedStateVariables.put("file", file);
                 }
             }
 

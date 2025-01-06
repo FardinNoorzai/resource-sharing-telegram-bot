@@ -18,7 +18,8 @@ public enum USER_STATES {
     FILE_LIST,
     FILE_EDIT,
     FILE_DELETE,
-    FILE_SELECT
+    FILE_SELECT,
+    BROADCAST,
 
 
 }

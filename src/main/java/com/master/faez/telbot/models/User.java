@@ -19,5 +19,6 @@ public class User {
     String lastName;
     String username;
     @Enumerated(EnumType.STRING)
+    @Column(length = 512)
     USER_ROLE USER_ROLE;
 }

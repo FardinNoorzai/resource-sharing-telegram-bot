@@ -36,7 +36,6 @@ public class AdminDeleteResourceResponseStrategy implements ResponseStrategy {
             }else{
                 System.out.println(resource.getName());
             }
-
             resourceService.deleteById(resource.getId());
             applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of("Resource with name: "+ resource.getName()+" was deleted","you are returned back to Resource selection menu"),userSession));
             applicationEventPublisher.publishEvent(new ProcessedMessage(this, CONSTANTS.KEYBOARD_RESOURCE_MANAGEMENT, null, List.of("select one of keys to proceed"),userSession));

@@ -6,13 +6,10 @@ import com.master.faez.telbot.models.User;
 import com.master.faez.telbot.state.StateMachineConfig;
 import com.master.faez.telbot.state.USER_EVENTS;
 import com.master.faez.telbot.state.USER_STATES;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.persist.DefaultStateMachinePersister;
 import org.springframework.statemachine.persist.StateMachinePersister;
-import org.springframework.statemachine.state.State;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.ArrayList;
@@ -38,15 +35,25 @@ public class UserStateServiceImp implements UserStateService {
     @Override
     public UserSession getCurrentSession(Update update) {
         String id = update.getMessage().getFrom().getId().toString();
-        System.out.println(" id " + id);
         UserSession session = getSessionFromContext(update.getMessage().getFrom().getId());
         if(session != null){
             session.setUpdate(update);
             return session;
         }
         if(ifStateMachineExist(id)){
-            StateMachine<USER_STATES,USER_EVENTS> statemachine = stateMachineConfig.newAdminStateMachine(id);
             User user = loadUserFromDatabase(update.getMessage().getFrom().getId());
+
+            //creating state machine based on the user role
+            StateMachine<USER_STATES,USER_EVENTS> statemachine = null;
+            if(user != null){
+                if(user.getUSER_ROLE() == USER_ROLE.ADMIN){
+                    statemachine = stateMachineConfig.newAdminStateMachine(id);
+                }else{
+                    statemachine = stateMachineConfig.newUserStateMachine(id);
+                }
+            }
+
+
             try {
                 StateMachine<USER_STATES,USER_EVENTS> machine = persist.restore(statemachine,id);
                 machine.start();
@@ -56,7 +63,18 @@ public class UserStateServiceImp implements UserStateService {
             }
         }else{
             User user = createUser(update);
-            StateMachine<USER_STATES,USER_EVENTS> statemachine = stateMachineConfig.newAdminStateMachine(id);
+            StateMachine<USER_STATES,USER_EVENTS> statemachine = null;
+
+            //creating state machine based on the user role
+            if(user != null){
+                if(user.getUSER_ROLE() == USER_ROLE.ADMIN){
+                    statemachine = stateMachineConfig.newAdminStateMachine(id);
+                }else{
+                    statemachine = stateMachineConfig.newUserStateMachine(id);
+                }
+            }
+
+
             statemachine.start();
             try {
                 persist.persist(statemachine,id);

@@ -19,9 +19,11 @@ public class Resource {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
     String name;
-    @OneToMany(mappedBy = "resource",fetch = FetchType.EAGER)
+
+    @OneToMany(mappedBy = "resource", fetch = FetchType.EAGER)
     @JsonIgnore
     List<File> files;
+
     @JsonIgnore
     @ManyToOne
     Book book;

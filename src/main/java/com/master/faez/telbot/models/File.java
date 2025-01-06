@@ -1,5 +1,6 @@
 package com.master.faez.telbot.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,5 +20,6 @@ public class File {
     Double size;
     String fileId;
     @ManyToOne
+    @JsonIgnore
     Resource resource;
 }

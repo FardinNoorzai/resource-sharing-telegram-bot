@@ -28,6 +28,9 @@ public class ResourceService {
     public Resource findByBookAndName(String name,Book book) {
         return resourceRepository.findByBookAndName(book,name).orElse(null);
     }
+    public Resource findByName(String name){
+        return resourceRepository.findByName(name).orElse(null);
+    }
     public Resource findById(Integer id){
         return resourceRepository.findById(id).orElse(null);
     }

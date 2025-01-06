@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface ResourceRepository extends JpaRepository<Resource, Integer> {
     public Optional<Resource> findByBookAndName(Book book, String name);
     public List<Resource> findAllByBook(Book book);
-
+    public Optional<Resource> findByName(String name);
 
 
 }

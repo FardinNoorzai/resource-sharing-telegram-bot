@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -21,7 +22,6 @@ public class ResponseGenerator {
 
     @EventListener(ProcessedMessage.class)
     public void processedMessage(ProcessedMessage processedMessage) {
-        System.out.println(processedMessage+ " message was received");
         SendMessage sendMessage = new SendMessage();
         if(processedMessage.getButtons() != null){
             ReplyKeyboardMarkup replyKeyboardMarkup = keyboardGenerator.getReplyKeyboardMarkup(processedMessage);
@@ -52,12 +52,16 @@ public class ResponseGenerator {
     }
 
 
-    public void sendFiles(List<String> files,Long chatId){
+    public void sendFiles(Map<String,String> files, Long chatId){
         if(files != null){
-            for (String file : files) {
+            for (Map.Entry<String, String> entry : files.entrySet()) {
+
+                String fileName = entry.getKey();
+                String fileId = entry.getValue();
                 SendDocument document = new SendDocument();
                 document.setChatId(chatId);
-                document.setDocument(new InputFile(file));
+                document.setDocument(new InputFile(fileId));
+                document.setCaption(fileName);
                 try {
                     telegramLongPollingBot.execute(document);
                 }catch (Exception e){

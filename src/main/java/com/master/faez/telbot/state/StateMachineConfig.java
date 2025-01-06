@@ -159,6 +159,61 @@ public class StateMachineConfig {
                 .source(USER_STATES.FILE_SELECT)
                 .target(USER_STATES.FILE_DELETE)
                 .event(USER_EVENTS.DELETE_FILE)
-                ;
+                .and()
+                .withExternal()
+                .source(USER_STATES.FILE_DELETE)
+                .target(USER_STATES.FILE_LIST)
+                .event(USER_EVENTS.DELETE_FILE);
+    }
+
+
+    public StateMachine<USER_STATES, USER_EVENTS> newCustomStepUserStateMachine(USER_STATES state){
+        StateMachineBuilder.Builder<USER_STATES, USER_EVENTS> builder = StateMachineBuilder.builder();
+        try {
+            builder.configureStates()
+                    .withStates()
+                    .initial(state)
+                    .state(USER_STATES.HOME)
+                    .state(USER_STATES.BOOK_LIST)
+                    .state(USER_STATES.RESOURCE_LIST);
+
+            UserTransition(builder);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return builder.build();
+    }
+
+
+
+    public StateMachine<USER_STATES, USER_EVENTS> newUserStateMachine(String id){
+        StateMachineBuilder.Builder<USER_STATES, USER_EVENTS> builder = StateMachineBuilder.builder();
+        try {
+            builder.configureStates()
+                    .withStates()
+                    .initial(USER_STATES.START)
+                    .state(USER_STATES.BOOK_LIST)
+                    .state(USER_STATES.RESOURCE_LIST);
+
+            UserTransition(builder);
+            builder.configureConfiguration().withConfiguration().machineId(id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return builder.build();
+    }
+
+
+    private void UserTransition(StateMachineBuilder.Builder<USER_STATES, USER_EVENTS> builder) throws Exception {
+        builder.configureTransitions()
+                .withExternal()
+                .source(USER_STATES.START)
+                .target(USER_STATES.BOOK_LIST)
+                .event(USER_EVENTS.USER_EXISTS_OR_CREATED)
+                .and()
+                .withExternal()
+                .source(USER_STATES.BOOK_LIST)
+                .target(USER_STATES.RESOURCE_LIST)
+                .event(USER_EVENTS.SELECT_RESOURCE);
     }
 }

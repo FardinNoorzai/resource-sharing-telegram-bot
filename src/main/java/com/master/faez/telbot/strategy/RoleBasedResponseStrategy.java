@@ -8,6 +8,7 @@ import com.master.faez.telbot.state.StateMachineConfig;
 import com.master.faez.telbot.state.USER_EVENTS;
 import com.master.faez.telbot.state.USER_STATES;
 import com.master.faez.telbot.strategy.admin.AdminResponseStrategy;
+import com.master.faez.telbot.strategy.user.UserResponseStrategy;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ import java.util.Map;
 public class RoleBasedResponseStrategy implements ResponseStrategy{
     @Autowired
     AdminResponseStrategy adminResponseStrategy;
+    @Autowired
+    UserResponseStrategy userResponseStrategy;
     Map<USER_ROLE,ResponseStrategy> responseStrategies = new HashMap<>();
 
     @Autowired
@@ -60,12 +63,19 @@ public class RoleBasedResponseStrategy implements ResponseStrategy{
         StateMachine<USER_STATES, USER_EVENTS> stateMachine;
         if(userSession.getStates().isEmpty()){
             System.out.println("state stack is empty");
-            stateMachine = stateMachineConfig.newAdminStateMachine(userSession.getUser().getId().toString());
+            if(userSession.getUser().getUSER_ROLE() == USER_ROLE.ADMIN){
+                stateMachine = stateMachineConfig.newAdminStateMachine(userSession.getUser().getId().toString());
+            }else{
+                stateMachine = stateMachineConfig.newUserStateMachine(userSession.getUser().getId().toString());
+            }
         }else{
             System.out.println("state stack size is"+ " " + userSession.getStates().size());
             System.out.println("state stack is not empty and user is returning to the " + userSession.getStates().peek());
-
-            stateMachine = stateMachineConfig.newCustomStepAdminStateMachine(userSession.getStates().pop());
+            if(userSession.getUser().getUSER_ROLE() == USER_ROLE.ADMIN){
+                stateMachine = stateMachineConfig.newCustomStepAdminStateMachine(userSession.getStates().pop());
+            }else{
+                stateMachine = stateMachineConfig.newCustomStepUserStateMachine(userSession.getStates().pop());
+            }
         }
         StateMachineListener stateMachineListener = new StateMachineListener();
         stateMachineListener.setPersist(persist);
@@ -81,5 +91,6 @@ public class RoleBasedResponseStrategy implements ResponseStrategy{
     @PostConstruct
     public void init() {
         responseStrategies.put(USER_ROLE.ADMIN,adminResponseStrategy);
+        responseStrategies.put(USER_ROLE.USER,userResponseStrategy);
     }
 }

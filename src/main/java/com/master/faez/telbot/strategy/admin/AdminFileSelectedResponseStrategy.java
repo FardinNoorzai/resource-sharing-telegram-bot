@@ -29,7 +29,7 @@ public class AdminFileSelectedResponseStrategy implements ResponseStrategy {
             machine.sendEvent(USER_EVENTS.EDIT_FILE);
             applicationEventPublisher.publishEvent(new ProcessedMessage(this, List.of("Back"),null,List.of("Send me the new name use keyboard when you are done!"),userSession));
         }else if(update.getMessage().getText().equalsIgnoreCase("Delete")){
-            machine.sendEvent(USER_EVENTS.DELETE_BOOK);
+            machine.sendEvent(USER_EVENTS.DELETE_FILE);
             applicationEventPublisher.publishEvent(new ProcessedMessage(this, List.of("Yes","Back"),null,List.of("Are you sure you want to delete the file?"),userSession));
 
         }else{

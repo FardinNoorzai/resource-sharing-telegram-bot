@@ -7,16 +7,17 @@ import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
 
 import java.util.List;
+import java.util.Map;
 
 @Setter
 @Getter
 public class ProcessedMessage extends ApplicationEvent {
     List<String> buttons;
-    List<String> files;
+    Map<String,String> files;
     List<String> messages;
     UserSession userSession;
 
-    public ProcessedMessage(Object source, List<String> buttons, List<String> files, List<String> messages, UserSession userSession) {
+    public ProcessedMessage(Object source, List<String> buttons, Map<String,String> files, List<String> messages, UserSession userSession) {
         super(source);
         this.buttons = buttons;
         this.files = files;
