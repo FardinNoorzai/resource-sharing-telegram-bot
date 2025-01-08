@@ -30,7 +30,11 @@ public class StateMachineConfig {
                         .state(USER_STATES.FILE_LIST)
                         .state(USER_STATES.FILE_SELECT)
                         .state(USER_STATES.FILE_EDIT)
-                        .state(USER_STATES.FILE_DELETE);
+                        .state(USER_STATES.FILE_DELETE)
+                        .state(USER_STATES.BROADCAST)
+                        .state(USER_STATES.ABOUT_US)
+                        .state(USER_STATES.ADD_ADMIN)
+                        .state(USER_STATES.DELETE_ADMIN);
 
             adminTransition(builder);
             builder.configureConfiguration().withConfiguration().machineId(id);
@@ -60,7 +64,13 @@ public class StateMachineConfig {
                     .state(USER_STATES.FILE_ADD)
                     .state(USER_STATES.FILE_SELECT)
                     .state(USER_STATES.FILE_EDIT)
-                    .state(USER_STATES.FILE_DELETE);
+                    .state(USER_STATES.FILE_DELETE)
+                    .state(USER_STATES.BROADCAST)
+                    .state(USER_STATES.ABOUT_US)
+                    .state(USER_STATES.ADD_ADMIN)
+                    .state(USER_STATES.DELETE_ADMIN);
+
+
                         adminTransition(builder);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -163,7 +173,27 @@ public class StateMachineConfig {
                 .withExternal()
                 .source(USER_STATES.FILE_DELETE)
                 .target(USER_STATES.FILE_LIST)
-                .event(USER_EVENTS.DELETE_FILE);
+                .event(USER_EVENTS.DELETE_FILE)
+                .and()
+                .withExternal()
+                .source(USER_STATES.HOME)
+                .target(USER_STATES.BROADCAST)
+                .event(USER_EVENTS.BROADCAST)
+                .and()
+                .withExternal()
+                .source(USER_STATES.HOME)
+                .target(USER_STATES.ABOUT_US)
+                .event(USER_EVENTS.ABOUT_US)
+                .and()
+                .withExternal()
+                .source(USER_STATES.HOME)
+                .target(USER_STATES.ADD_ADMIN)
+                .event(USER_EVENTS.ADD_ADMIN)
+                .and()
+                .withExternal()
+                .source(USER_STATES.HOME)
+                .target(USER_STATES.DELETE_ADMIN)
+                .event(USER_EVENTS.DELETE_ADMIN);
     }
 
 

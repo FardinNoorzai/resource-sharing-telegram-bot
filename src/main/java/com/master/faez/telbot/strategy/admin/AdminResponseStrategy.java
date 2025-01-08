@@ -49,6 +49,14 @@ public class AdminResponseStrategy implements ResponseStrategy {
     AdminEditFileResponseStrategy adminEditFileResponseStrategy;
     @Autowired
     AdminDeleteFileResponseStrategy adminDeleteFileResponseStrategy;
+    @Autowired
+    AdminBroadcastResponseStrategy adminBroadcastResponseStrategy;
+    @Autowired
+    AdminAboutUsResponseStrategy adminAboutUsResponseStrategy;
+    @Autowired
+    AdminAddAdminResponseStrategy adminAddAdminResponseStrategy;
+    @Autowired
+    AdminDeleteAdminResponseStrategy adminDeleteAdminResponseStrategy;
     HashMap<USER_STATES, ResponseStrategy> responseStrategies;
     @Override
     public void response(UserSession userSession) {
@@ -82,5 +90,10 @@ public class AdminResponseStrategy implements ResponseStrategy {
         responseStrategies.put(USER_STATES.BOOK_EDIT,adminBookEditResponseStrategy);
         responseStrategies.put(USER_STATES.FILE_EDIT,adminEditFileResponseStrategy);
         responseStrategies.put(USER_STATES.FILE_DELETE, adminDeleteFileResponseStrategy);
+        responseStrategies.put(USER_STATES.BROADCAST,adminBroadcastResponseStrategy);
+        responseStrategies.put(USER_STATES.ABOUT_US,adminAboutUsResponseStrategy);
+        responseStrategies.put(USER_STATES.ADD_ADMIN,adminAddAdminResponseStrategy);
+        responseStrategies.put(USER_STATES.DELETE_ADMIN,adminDeleteAdminResponseStrategy);
     }
+
 }

@@ -2,7 +2,6 @@ package com.master.faez.telbot.state;
 
 public enum USER_EVENTS {
     USER_EXISTS_OR_CREATED,
-    HOME_KEYBOARD_RESPONSE,
     SELECT_BOOK,
     BOOK_SELECTED,
     CREATE_BOOK,
@@ -19,6 +18,10 @@ public enum USER_EVENTS {
     DELETE_FILE,
     FILE_SELECTED,
     BROADCAST,
+    ABOUT_US,
+    ADD_ADMIN,
+    DELETE_ADMIN,
+
 
 
 }

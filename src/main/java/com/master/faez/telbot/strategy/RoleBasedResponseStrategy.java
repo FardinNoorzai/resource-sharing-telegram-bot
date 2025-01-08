@@ -38,18 +38,13 @@ public class RoleBasedResponseStrategy implements ResponseStrategy{
     ApplicationEventPublisher applicationEventPublisher;
     @Override
     public void response(UserSession userSession) {
-        if(userSession.getUpdate().getMessage().getFrom().getId().toString().equalsIgnoreCase("5024603387")){
-            System.out.println("saeed was fucked!!");
-            applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null, List.of("Fuck you! \n kir ma jawab tor meda!!"),userSession));
-            return;
-        }
         if(userSession.getUpdate().getMessage().hasText()){
             if(userSession.getUpdate().getMessage().getText().equalsIgnoreCase("Back")){
                 goBack(userSession);
             }
         }
 
-        ResponseStrategy responseStrategy = responseStrategies.get(userSession.getUser().getUSER_ROLE());
+        ResponseStrategy responseStrategy = responseStrategies.get(userSession.getUser().getUserRole());
         if(responseStrategy != null) {
             log.warn("state {} before response", userSession.getStateMachine().getState().getId());
             responseStrategy.response(userSession);
@@ -63,7 +58,7 @@ public class RoleBasedResponseStrategy implements ResponseStrategy{
         StateMachine<USER_STATES, USER_EVENTS> stateMachine;
         if(userSession.getStates().isEmpty()){
             System.out.println("state stack is empty");
-            if(userSession.getUser().getUSER_ROLE() == USER_ROLE.ADMIN){
+            if(userSession.getUser().getUserRole() == USER_ROLE.ADMIN){
                 stateMachine = stateMachineConfig.newAdminStateMachine(userSession.getUser().getId().toString());
             }else{
                 stateMachine = stateMachineConfig.newUserStateMachine(userSession.getUser().getId().toString());
@@ -71,7 +66,7 @@ public class RoleBasedResponseStrategy implements ResponseStrategy{
         }else{
             System.out.println("state stack size is"+ " " + userSession.getStates().size());
             System.out.println("state stack is not empty and user is returning to the " + userSession.getStates().peek());
-            if(userSession.getUser().getUSER_ROLE() == USER_ROLE.ADMIN){
+            if(userSession.getUser().getUserRole() == USER_ROLE.ADMIN){
                 stateMachine = stateMachineConfig.newCustomStepAdminStateMachine(userSession.getStates().pop());
             }else{
                 stateMachine = stateMachineConfig.newCustomStepUserStateMachine(userSession.getStates().pop());

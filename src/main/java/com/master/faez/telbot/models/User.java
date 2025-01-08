@@ -20,5 +20,5 @@ public class User {
     String username;
     @Enumerated(EnumType.STRING)
     @Column(length = 512)
-    USER_ROLE USER_ROLE;
+    USER_ROLE userRole;
 }

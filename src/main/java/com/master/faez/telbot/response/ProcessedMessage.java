@@ -16,6 +16,7 @@ public class ProcessedMessage extends ApplicationEvent {
     Map<String,String> files;
     List<String> messages;
     UserSession userSession;
+    List<BroadcastMessage> broadcastMessages;
 
     public ProcessedMessage(Object source, List<String> buttons, Map<String,String> files, List<String> messages, UserSession userSession) {
         super(source);
@@ -23,5 +24,6 @@ public class ProcessedMessage extends ApplicationEvent {
         this.files = files;
         this.messages = messages;
         this.userSession = userSession;
+        broadcastMessages = null;
     }
 }

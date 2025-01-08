@@ -12,4 +12,7 @@ public class StateMachineService {
     public boolean exist(String stateMachineId) {
         return stateMachineRepository.existsById(stateMachineId);
     }
+    public void deleteById(Long stateMachineId) {
+        stateMachineRepository.deleteById(stateMachineId.toString());
+    }
 }

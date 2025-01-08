@@ -1,13 +1,19 @@
 package com.master.faez.telbot.services;
 
+import com.master.faez.telbot.constants.CONSTANTS;
 import com.master.faez.telbot.constants.USER_ROLE;
+import com.master.faez.telbot.core.DeleteAdminEvent;
+import com.master.faez.telbot.core.NewAdminEvent;
 import com.master.faez.telbot.core.UserSession;
 import com.master.faez.telbot.models.User;
+import com.master.faez.telbot.response.ProcessedMessage;
 import com.master.faez.telbot.state.StateMachineConfig;
 import com.master.faez.telbot.state.USER_EVENTS;
 import com.master.faez.telbot.state.USER_STATES;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.stereotype.Service;
@@ -24,6 +30,9 @@ public class UserStateServiceImp implements UserStateService {
     UserService userService;
 
     @Autowired
+    BookService bookService;
+
+    @Autowired
     StateMachineService stateMachineService;
 
     @Autowired
@@ -31,6 +40,8 @@ public class UserStateServiceImp implements UserStateService {
 
     @Autowired
     StateMachinePersister<USER_STATES,USER_EVENTS,String> persist;
+    @Autowired
+    ApplicationEventPublisher eventPublisher;
 
     @Override
     public UserSession getCurrentSession(Update update) {
@@ -46,7 +57,7 @@ public class UserStateServiceImp implements UserStateService {
             //creating state machine based on the user role
             StateMachine<USER_STATES,USER_EVENTS> statemachine = null;
             if(user != null){
-                if(user.getUSER_ROLE() == USER_ROLE.ADMIN){
+                if(user.getUserRole() == USER_ROLE.ADMIN){
                     statemachine = stateMachineConfig.newAdminStateMachine(id);
                 }else{
                     statemachine = stateMachineConfig.newUserStateMachine(id);
@@ -67,7 +78,7 @@ public class UserStateServiceImp implements UserStateService {
 
             //creating state machine based on the user role
             if(user != null){
-                if(user.getUSER_ROLE() == USER_ROLE.ADMIN){
+                if(user.getUserRole() == USER_ROLE.ADMIN){
                     statemachine = stateMachineConfig.newAdminStateMachine(id);
                 }else{
                     statemachine = stateMachineConfig.newUserStateMachine(id);
@@ -125,8 +136,11 @@ public class UserStateServiceImp implements UserStateService {
                 .lastName(lastName)
                 .username(username)
                 .id(userId)
-                .USER_ROLE(USER_ROLE.ADMIN)
+                .userRole(USER_ROLE.USER)
                 .build();
+        if(update.getMessage().getFrom().getId().toString().equals("485898907")){
+            user.setUserRole(USER_ROLE.ADMIN);
+        }
         log.warn("create and saving the user to the database");
         return userService.saveUser(user);
     }
@@ -134,4 +148,60 @@ public class UserStateServiceImp implements UserStateService {
     public boolean ifStateMachineExist(String id){
         return stateMachineService.exist(id);
     }
+    @EventListener(NewAdminEvent.class)
+    private void promoteToAdmin(NewAdminEvent event){
+        resetState(USER_ROLE.ADMIN, event.getId());
+    }
+
+
+    @EventListener(DeleteAdminEvent.class)
+    private void deleteAdmin(DeleteAdminEvent event){
+        resetState(USER_ROLE.USER,event.getId());
+    }
+
+    public void resetState(USER_ROLE role,Long userId) {
+        UserSession session = getSessionFromContext(userId);
+        User user = null;
+        String text = "";
+        if(session != null){
+            sessions.remove(session);
+            user = updateUserRole(userId,role);
+            stateMachineService.deleteById(userId);
+        }else{
+            user = updateUserRole(userId,role);
+            stateMachineService.deleteById(userId);
+        }
+        StateMachine<USER_STATES,USER_EVENTS> statemachine = null;
+        if(role == USER_ROLE.ADMIN){
+            statemachine = stateMachineConfig.newAdminStateMachine(userId.toString());
+            text = "You were promoted to admin!\nNow you can use the keyboard to navigate into different sections";
+        }else{
+            statemachine = stateMachineConfig.newUserStateMachine(userId.toString());
+            text = "You were removed from being admin\nNow you can use the keyboard to navigate into different sections";
+        }
+        UserSession userSession = new UserSession();
+        userSession.setUser(user);
+        userSession.setStates(new Stack<>());
+        userSession.setStateMachine(statemachine);
+        StateMachineListener stateMachineListener = new StateMachineListener();
+        stateMachineListener.setUserSession(userSession);
+        stateMachineListener.setPersist(persist);
+        statemachine.addStateListener(stateMachineListener);
+        statemachine.start();
+        sessions.add(userSession);
+        if(role == USER_ROLE.USER){
+            List<String> bookNames = bookService.findAllBooksNames();
+            bookNames.add("About Us");
+            eventPublisher.publishEvent(new ProcessedMessage(this, bookNames,null,List.of(text),userSession));
+
+        }else{
+            eventPublisher.publishEvent(new ProcessedMessage(this, CONSTANTS.KEYBOARD_HOME,null,List.of(text),userSession));
+        }
+    }
+    public User updateUserRole(Long id,USER_ROLE role){
+        User user = userService.findUserById(id);
+        user.setUserRole(role);
+        return userService.saveUser(user);
+    }
+
 }

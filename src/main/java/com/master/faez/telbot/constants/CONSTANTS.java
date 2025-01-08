@@ -5,7 +5,7 @@ import java.util.List;
 public class CONSTANTS {
     public final static String BACK = "Back";
     public final static String CANCEL = "Cancel";
-    public final static List<String> KEYBOARD_HOME = List.of("Books","Broadcast Message");
+    public final static List<String> KEYBOARD_HOME = List.of("Books","Broadcast Message","About us","Add new Admin","Delete an Admin");
     public final static List<String> ERROR_INVALID_KEYBOARD_KEY = List.of("Invalid keyboard key","Use the keyboard!");
     public final static List<String> KEYBOARD_CANCEL = List.of(CANCEL);
     public final static List<String> KEYBOARD_BOOK_MANAGEMENT = List.of("List Books","Create New Book","Back");

@@ -3,6 +3,7 @@ package com.master.faez.telbot.strategy.user;
 import com.master.faez.telbot.core.UserSession;
 import com.master.faez.telbot.models.Book;
 import com.master.faez.telbot.response.ProcessedMessage;
+import com.master.faez.telbot.services.AboutService;
 import com.master.faez.telbot.services.BookService;
 import com.master.faez.telbot.services.ResourceService;
 import com.master.faez.telbot.state.USER_EVENTS;
@@ -22,6 +23,8 @@ public class UserBookListResponseStrategy implements ResponseStrategy {
     ResourceService resourceService;
     @Autowired
     ApplicationEventPublisher eventPublisher;
+    @Autowired
+    AboutService aboutService;
     @Override
     public void response(UserSession userSession) {
         if(userSession.getUpdate().hasMessage()){
@@ -36,6 +39,10 @@ public class UserBookListResponseStrategy implements ResponseStrategy {
                     text = "Use the keyboard to navigate into different sections.";
                 }
                 eventPublisher.publishEvent(new ProcessedMessage(this,books,null,List.of(text),userSession));
+                return;
+            }else if(message.equalsIgnoreCase("About us")){
+                String text = aboutService.getAllAbouts().get(0).getText();
+                eventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of(text),userSession));
                 return;
             }
             if(book != null){

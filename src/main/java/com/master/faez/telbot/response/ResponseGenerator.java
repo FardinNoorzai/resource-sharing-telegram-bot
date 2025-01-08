@@ -30,12 +30,38 @@ public class ResponseGenerator {
         sendMessage.setChatId(processedMessage.getUserSession().getUser().getId());
         String text = generatedText(processedMessage.getMessages());
         sendMessage.setText(text);
+        System.out.println("sending message to " + processedMessage.getUserSession().getUser().getId() + " with text " + text);
         try {
             telegramLongPollingBot.execute(sendMessage);
         }catch (Exception e){
             e.printStackTrace();
         }
         sendFiles(processedMessage.getFiles(), processedMessage.getUserSession().getUser().getId());
+        if(processedMessage.getBroadcastMessages() != null){
+            processBroadcasts(processedMessage);
+        }
+    }
+
+    public void processBroadcasts(ProcessedMessage processedMessage) {
+        List<BroadcastMessage> broadcastMessages = processedMessage.getBroadcastMessages();
+        for(BroadcastMessage broadcastMessage : broadcastMessages){
+            if(broadcastMessage.getFile() != null){
+                if(!broadcastMessage.getFile().isEmpty() && !broadcastMessage.getFile().isBlank()){
+                    System.out.println("Broadcast message to "+ broadcastMessage.getChatId() + " file caption "+ broadcastMessage.getMessage()+ " file id"+ broadcastMessage.getFile());
+                    sendFiles(Map.of(broadcastMessage.getMessage(),broadcastMessage.getFile()),broadcastMessage.getChatId());
+                }
+            }else{
+                SendMessage sendMessage = new SendMessage();
+                sendMessage.setChatId(broadcastMessage.getChatId());
+                sendMessage.setText(broadcastMessage.getMessage());
+                try {
+                    System.out.println("Broadcast message to "+ broadcastMessage.getChatId() + " message text "+ broadcastMessage.getMessage());
+                    telegramLongPollingBot.execute(sendMessage);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 

@@ -30,6 +30,7 @@ public class UserStartResponseStrategy implements ResponseStrategy {
         }else{
             text = "Use the keyboard to navigate into different sections.";
         }
+        bookNames.add("About us");
         ProcessedMessage processedMessage = new ProcessedMessage(this, bookNames,null, List.of(text),userSession);
         applicationEventPublisher.publishEvent(processedMessage);
         userSession.getStateMachine().sendEvent(USER_EVENTS.USER_EXISTS_OR_CREATED);
