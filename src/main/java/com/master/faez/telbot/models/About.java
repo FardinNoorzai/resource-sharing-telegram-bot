@@ -16,6 +16,6 @@ public class About {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
-    @Column(length = 65535)
+    @Column(length = 65535,nullable = false)
     String text;
 }

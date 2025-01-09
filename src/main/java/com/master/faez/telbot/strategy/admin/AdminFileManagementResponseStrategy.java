@@ -46,7 +46,10 @@ public class AdminFileManagementResponseStrategy implements ResponseStrategy {
         }else if(text.equalsIgnoreCase("Add files")){
             applicationEventPublisher.publishEvent(new ProcessedMessage(this,List.of("Back"),null,List.of("send me or forward me files that you wanna add","Use the keyboard when you are done"),userSession));
             stateMachine.sendEvent(USER_EVENTS.ADD_FILE);
-        } else if (text.equalsIgnoreCase("List files")){
+        }else if(text.equalsIgnoreCase("Edit Resource")){
+            applicationEventPublisher.publishEvent(new ProcessedMessage(this,List.of("Back"),null,List.of("Send me the new name for this resource"),userSession));
+            stateMachine.sendEvent(USER_EVENTS.RESOURCE_EDIT);
+        }else if (text.equalsIgnoreCase("List files")){
             Resource resource = (Resource) stateMachine.getExtendedState().getVariables().get("resource");
             resource = resourceService.findById(resource.getId());
             stateMachine.sendEvent(USER_EVENTS.LIST_FILES);

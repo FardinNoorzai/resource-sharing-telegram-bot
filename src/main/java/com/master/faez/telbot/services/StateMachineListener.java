@@ -22,8 +22,6 @@ public class StateMachineListener extends StateMachineListenerAdapter<USER_STATE
         Stack<USER_STATES> states = userSession.getStates();
         if(from != null){
             states.push(from.getId());
-            System.out.println("was pushed"+ " " + from.getId());
-            System.out.println("stack size in listener is " + states.size());
             try {
                 persist.persist(userSession.getStateMachine(),userSession.getUser().getId().toString());
             } catch (Exception e) {

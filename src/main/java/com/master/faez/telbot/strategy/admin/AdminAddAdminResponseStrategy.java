@@ -24,7 +24,7 @@ public class AdminAddAdminResponseStrategy implements ResponseStrategy {
     public void response(UserSession userSession) {
         Update update = userSession.getUpdate();
         System.out.println("add admin class");
-        try{
+
             Long id = Long.valueOf(update.getMessage().getText());
             User user = userService.findUserById(id);
             System.out.println(user.getUserRole());
@@ -38,9 +38,5 @@ public class AdminAddAdminResponseStrategy implements ResponseStrategy {
             }else{
                 applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null, List.of("This user has not started the bot yet"),userSession));
             }
-        }catch (Exception e){
-            applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null, List.of("Sorry there was an error"),userSession));
-
-        }
     }
 }

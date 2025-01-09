@@ -21,9 +21,9 @@ public class AdminAboutUsResponseStrategy implements ResponseStrategy {
     public void response(UserSession userSession) {
         String text = userSession.getUpdate().getMessage().getText();
         About about = new About();
-        about.setText(text + "\n\n\nDeveloped By @Fardin_Noorzai" );
+        about.setText(text + "\n\n\nDeveloped By @Fardin_Noorzai\nThis Telegram bot is dedicated with love and gratitude to my Mom and Dad, my guiding lights, and to my siblings, my constant source of support and joy.❤\uFE0F" );
         aboutService.deleteAllAbout();
-        aboutService.saveAbout(about);
-        applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null, List.of("Text was updated to:\n" + text + "\n\n\nDeveloped By @Fardin_Noorzai"),userSession));
+        about = aboutService.saveAbout(about);
+        applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null, List.of("Text was updated to:\n"+ about.getText()),userSession));
     }
 }

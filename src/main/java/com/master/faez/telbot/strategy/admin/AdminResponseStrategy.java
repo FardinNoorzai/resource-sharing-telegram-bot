@@ -56,6 +56,8 @@ public class AdminResponseStrategy implements ResponseStrategy {
     @Autowired
     AdminAddAdminResponseStrategy adminAddAdminResponseStrategy;
     @Autowired
+    AdminResourceEditResponseStrategy adminResourceEditResponseStrategy;
+    @Autowired
     AdminDeleteAdminResponseStrategy adminDeleteAdminResponseStrategy;
     HashMap<USER_STATES, ResponseStrategy> responseStrategies;
     @Override
@@ -94,6 +96,7 @@ public class AdminResponseStrategy implements ResponseStrategy {
         responseStrategies.put(USER_STATES.ABOUT_US,adminAboutUsResponseStrategy);
         responseStrategies.put(USER_STATES.ADD_ADMIN,adminAddAdminResponseStrategy);
         responseStrategies.put(USER_STATES.DELETE_ADMIN,adminDeleteAdminResponseStrategy);
+        responseStrategies.put(USER_STATES.RESOURCE_EDIT,adminResourceEditResponseStrategy);
     }
 
 }

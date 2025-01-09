@@ -17,6 +17,7 @@ public class MessageProcessorImp implements MessageProcessor {
     @Override
     public void processMessage(Update update) {
         UserSession userSession  = userStateService.getCurrentSession(update);
+        userSession.setLastActiveTime(System.currentTimeMillis());
         responseStrategy.response(userSession);
     }
 }

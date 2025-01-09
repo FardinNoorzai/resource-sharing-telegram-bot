@@ -34,7 +34,8 @@ public class StateMachineConfig {
                         .state(USER_STATES.BROADCAST)
                         .state(USER_STATES.ABOUT_US)
                         .state(USER_STATES.ADD_ADMIN)
-                        .state(USER_STATES.DELETE_ADMIN);
+                        .state(USER_STATES.DELETE_ADMIN)
+                        .state(USER_STATES.RESOURCE_EDIT);
 
             adminTransition(builder);
             builder.configureConfiguration().withConfiguration().machineId(id);
@@ -68,7 +69,9 @@ public class StateMachineConfig {
                     .state(USER_STATES.BROADCAST)
                     .state(USER_STATES.ABOUT_US)
                     .state(USER_STATES.ADD_ADMIN)
-                    .state(USER_STATES.DELETE_ADMIN);
+                    .state(USER_STATES.DELETE_ADMIN)
+                    .state(USER_STATES.RESOURCE_EDIT);
+
 
 
                         adminTransition(builder);
@@ -193,7 +196,12 @@ public class StateMachineConfig {
                 .withExternal()
                 .source(USER_STATES.HOME)
                 .target(USER_STATES.DELETE_ADMIN)
-                .event(USER_EVENTS.DELETE_ADMIN);
+                .event(USER_EVENTS.DELETE_ADMIN)
+                .and()
+                .withExternal()
+                .source(USER_STATES.FILE_MANAGEMENT)
+                .target(USER_STATES.RESOURCE_EDIT)
+                .event(USER_EVENTS.RESOURCE_EDIT);
     }
 
 

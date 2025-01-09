@@ -19,6 +19,7 @@ public class UserSession {
     Update update;
     StateMachine<USER_STATES, USER_EVENTS> stateMachine;
     Stack<USER_STATES> states;
+    long lastActiveTime;
     public UserSession() {
         states = new Stack<>();
     }

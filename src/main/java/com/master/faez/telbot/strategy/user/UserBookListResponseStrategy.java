@@ -29,22 +29,16 @@ public class UserBookListResponseStrategy implements ResponseStrategy {
     public void response(UserSession userSession) {
         if(userSession.getUpdate().hasMessage()){
             String message = userSession.getUpdate().getMessage().getText();
-            Book book = bookService.findByName(message);
-            if(message.equalsIgnoreCase("Back")){
-                List<String> books = bookService.findAllBooksNames();
-                String text = "";
-                if(books.isEmpty()){
-                    text = "Sorry, But no book was found :(";
-                }else{
-                    text = "Use the keyboard to navigate into different sections.";
-                }
-                eventPublisher.publishEvent(new ProcessedMessage(this,books,null,List.of(text),userSession));
-                return;
-            }else if(message.equalsIgnoreCase("About us")){
-                String text = aboutService.getAllAbouts().get(0).getText();
-                eventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of(text),userSession));
+           if(message.equalsIgnoreCase("About us")){
+               try{
+                   String text = aboutService.getAllAbouts().get(0).getText();
+                   eventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of(text),userSession));
+               }catch (IndexOutOfBoundsException e){
+                   eventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of("Sorry the information about us is not set yet try again this later"),userSession));
+               }
                 return;
             }
+            Book book = bookService.findByName(message);
             if(book != null){
                 List<String> resources = resourceService.findAllByBook(book);
                 resources.add("Back");
@@ -52,8 +46,15 @@ public class UserBookListResponseStrategy implements ResponseStrategy {
                 userSession.getStateMachine().getExtendedState().getVariables().put("book",book);
                 userSession.getStateMachine().sendEvent(USER_EVENTS.SELECT_RESOURCE);
             }else{
-                eventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of("Please use the keyboard"),userSession));
-            }
+                List<String> books = bookService.findAllBooksNames();
+                String text = "";
+                if(books.isEmpty()){
+                    text = "Sorry, But no book was found :(";
+                }else{
+                    text = "Use the keyboard to navigate into different sections.";
+                }
+                books.add("About us");
+                eventPublisher.publishEvent(new ProcessedMessage(this,books,null,List.of(text),userSession));}
         }
 
     }

@@ -20,6 +20,7 @@ public class Book {
     @JsonProperty("id")
     int id;
     @JsonProperty("name")
+    @Column(unique = true, nullable = false)
     String name;
     public Book() {
     }

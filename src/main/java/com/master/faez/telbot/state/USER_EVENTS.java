@@ -20,7 +20,7 @@ public enum USER_EVENTS {
     BROADCAST,
     ABOUT_US,
     ADD_ADMIN,
-    DELETE_ADMIN,
+    DELETE_ADMIN, RESOURCE_EDIT,
 
 
 

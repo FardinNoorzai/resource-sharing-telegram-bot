@@ -44,6 +44,10 @@ public class UserResourceListResponseStrategy implements ResponseStrategy {
                     text = "Sending files...";
                 }
                 eventPublisher.publishEvent(new ProcessedMessage(this,null,files,List.of(text),userSession));
+            }else{
+                List<String> resources = resourceService.findAllByBook(book);
+                resources.add("Back");
+                eventPublisher.publishEvent(new ProcessedMessage(this,resources,null,List.of("Use the keyboard to navigate into different sections"),userSession));
             }
         }
     }

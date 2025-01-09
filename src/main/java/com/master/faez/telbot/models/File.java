@@ -15,7 +15,7 @@ public class File {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     String fileType;
-    @Column(length = 65535)
+    @Column(length = 65535,unique=true)
     String fileName;
     Double size;
     String fileId;

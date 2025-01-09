@@ -13,6 +13,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.stereotype.Service;
@@ -43,14 +45,37 @@ public class RoleBasedResponseStrategy implements ResponseStrategy{
                 goBack(userSession);
             }
         }
-
         ResponseStrategy responseStrategy = responseStrategies.get(userSession.getUser().getUserRole());
         if(responseStrategy != null) {
             log.warn("state {} before response", userSession.getStateMachine().getState().getId());
+            try{
+                try {
+                    responseStrategy.response(userSession);
+                }catch (DataIntegrityViolationException e){
+                    applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of("Something was wrong with the name\nEither the name exist or your message did not contain a text"),userSession));
+                }catch (NullPointerException e){
+                    if(e.getMessage().contains("String.equalsIgnoreCase(String)")){
+                        applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of("Sorry your message did not contain text try again with a text"),userSession));
+                    }
+                    System.out.println("null pointer exception");
+                    throw new Exception();
+                }catch (InvalidDataAccessResourceUsageException e){
+                    if(e.getMessage().contains("Data too long for column")){
+                        applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of("Sorry your message was too long for this try a smaller text"),userSession));
+                    }
+                    System.out.println("invalid data access exception");
+                    throw new Exception();
+                }catch(NumberFormatException e){
+                    applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of("The Message do not represent a number try with a number"),userSession));
+                }
+            }
+            catch (Exception e){
+            userSession.getStates().removeAllElements();
+            goBack(userSession);
+            applicationEventPublisher.publishEvent(new ProcessedMessage(this,null,null,List.of("Sorry something went wrong somehow you managed to make an error\uD83D\uDE01 \nYou are back to home try again if the error persisted try contacting the support"),userSession));
             responseStrategy.response(userSession);
+        }
             log.warn("state {} after response", userSession.getStateMachine().getState().getId());
-        }else{
-            System.out.println("response strategy not found");
         }
     }
 

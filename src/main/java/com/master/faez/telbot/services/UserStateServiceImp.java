@@ -14,18 +14,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+
+import java.util.*;
 
 @Slf4j
 @Service
+@EnableScheduling
 public class UserStateServiceImp implements UserStateService {
-    List<UserSession> sessions = new ArrayList<>();
+    Map<String,UserSession> sessions = new HashMap();
     @Autowired
     UserService userService;
 
@@ -109,16 +111,14 @@ public class UserStateServiceImp implements UserStateService {
         stateMachineListener.setUserSession(userSession);
         stateMachineListener.setPersist(persist);
         statemachine.addStateListener(stateMachineListener);
-        sessions.add(userSession);
+        sessions.put(update.getMessage().getFrom().getId().toString(),userSession);
         return userSession;
     }
 
     public UserSession getSessionFromContext(Long userId) {
-        for(UserSession userSession : sessions) {
-            if(userSession.getUser().getId().equals(userId)) {
-                log.warn("session was returned from the context");
-                return userSession;
-            }
+        if(sessions.containsKey(userId.toString())){
+            System.out.println("Returning session");
+            return sessions.get(userId.toString());
         }
         return null;
     }
@@ -138,9 +138,6 @@ public class UserStateServiceImp implements UserStateService {
                 .id(userId)
                 .userRole(USER_ROLE.USER)
                 .build();
-        if(update.getMessage().getFrom().getId().toString().equals("485898907")){
-            user.setUserRole(USER_ROLE.ADMIN);
-        }
         log.warn("create and saving the user to the database");
         return userService.saveUser(user);
     }
@@ -188,7 +185,7 @@ public class UserStateServiceImp implements UserStateService {
         stateMachineListener.setPersist(persist);
         statemachine.addStateListener(stateMachineListener);
         statemachine.start();
-        sessions.add(userSession);
+        sessions.put(userSession.getUser().getId().toString(),userSession);
         if(role == USER_ROLE.USER){
             List<String> bookNames = bookService.findAllBooksNames();
             bookNames.add("About Us");
@@ -202,6 +199,9 @@ public class UserStateServiceImp implements UserStateService {
         User user = userService.findUserById(id);
         user.setUserRole(role);
         return userService.saveUser(user);
+    }
+    public Map<String,UserSession> getContext(){
+        return sessions;
     }
 
 }
